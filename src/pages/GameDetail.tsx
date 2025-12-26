@@ -21,7 +21,7 @@ const GameDetail = () => {
   // Increment view count
   useEffect(() => {
     if (id) {
-      supabase.rpc("increment_view_count", { game_id: id }).catch(console.error);
+      (supabase.rpc as any)("increment_view_count", { game_id: id }).catch(console.error);
     }
   }, [id]);
 
