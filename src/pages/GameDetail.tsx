@@ -1,11 +1,14 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { useGame } from "@/hooks/useGames";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Download, Copy, Eye, Calendar } from "lucide-react";
+import { ArrowLeft, Download, Copy, Eye, Calendar, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -14,6 +17,13 @@ const GameDetail = () => {
   const { data: game, isLoading } = useGame(id || "");
   const { toast } = useToast();
   const [search, setSearch] = useState("");
+
+  // Increment view count
+  useEffect(() => {
+    if (id) {
+      supabase.rpc("increment_view_count", { game_id: id }).catch(console.error);
+    }
+  }, [id]);
 
   const copyExtractCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -25,9 +35,9 @@ const GameDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header searchValue={search} onSearchChange={setSearch} />
-        <main className="container py-8">
+        <main className="container py-8 flex-1">
           <Skeleton className="h-8 w-32 mb-6" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
@@ -37,15 +47,16 @@ const GameDetail = () => {
             <Skeleton className="h-60" />
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
 
   if (!game) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header searchValue={search} onSearchChange={setSearch} />
-        <main className="container py-8">
+        <main className="container py-8 flex-1">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold mb-4">游戏未找到</h1>
             <Button asChild>
@@ -53,15 +64,16 @@ const GameDetail = () => {
             </Button>
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header searchValue={search} onSearchChange={setSearch} />
 
-      <main className="container py-8">
+      <main className="container py-8 flex-1">
         {/* 返回按钮 */}
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/">
@@ -74,7 +86,7 @@ const GameDetail = () => {
           {/* 左侧主内容 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 封面图 */}
-            <div className="aspect-video rounded-lg overflow-hidden bg-muted">
+            <div className="aspect-video rounded-xl overflow-hidden bg-muted shadow-lg">
               {game.cover_url ? (
                 <img
                   src={game.cover_url}
@@ -90,34 +102,38 @@ const GameDetail = () => {
 
             {/* 游戏截图 */}
             {game.screenshots && game.screenshots.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="font-semibold">游戏截图</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {game.screenshots.map((screenshot) => (
-                    <div
-                      key={screenshot.id}
-                      className="aspect-video rounded-lg overflow-hidden bg-muted"
-                    >
-                      <img
-                        src={screenshot.image_url}
-                        alt="游戏截图"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">游戏截图</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {game.screenshots.map((screenshot) => (
+                      <div
+                        key={screenshot.id}
+                        className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer hover:ring-2 ring-primary transition-all"
+                      >
+                        <img
+                          src={screenshot.image_url}
+                          alt="游戏截图"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* 游戏介绍 */}
             <Card>
               <CardHeader>
-                <CardTitle>游戏介绍</CardTitle>
+                <CardTitle className="text-lg">游戏介绍</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none">
+                <div className="prose prose-sm max-w-none dark:prose-invert">
                   {game.description ? (
-                    <p className="whitespace-pre-wrap">{game.description}</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{game.description}</p>
                   ) : (
                     <p className="text-muted-foreground">暂无介绍</p>
                   )}
@@ -129,17 +145,15 @@ const GameDetail = () => {
           {/* 右侧信息栏 */}
           <div className="space-y-6">
             {/* 游戏信息卡片 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">{game.title}</CardTitle>
+            <Card className="sticky top-24">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl leading-tight">{game.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* 版本信息 */}
                 {game.version_info && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      版本信息
-                    </p>
+                  <div className="p-3 rounded-lg bg-muted">
+                    <p className="text-xs text-muted-foreground mb-1">版本信息</p>
                     <p className="font-medium">{game.version_info}</p>
                   </div>
                 )}
@@ -147,15 +161,12 @@ const GameDetail = () => {
                 {/* 标签 */}
                 {game.tags && game.tags.length > 0 && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">标签</p>
-                    <div className="flex flex-wrap gap-1">
+                    <p className="text-xs text-muted-foreground mb-2">游戏标签</p>
+                    <div className="flex flex-wrap gap-1.5">
                       {game.tags.map((tag) => (
                         <Badge
                           key={tag.id}
-                          style={{
-                            backgroundColor: tag.color,
-                            color: "#fff",
-                          }}
+                          style={{ backgroundColor: tag.color, color: "#fff" }}
                         >
                           {tag.name}
                         </Badge>
@@ -165,16 +176,14 @@ const GameDetail = () => {
                 )}
 
                 {/* 统计信息 */}
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground border-t">
+                  <div className="flex items-center gap-1.5">
                     <Eye className="h-4 w-4" />
                     <span>{game.view_count} 次浏览</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4" />
-                    <span>
-                      {new Date(game.created_at).toLocaleDateString("zh-CN")}
-                    </span>
+                    <span>{new Date(game.created_at).toLocaleDateString("zh-CN")}</span>
                   </div>
                 </div>
               </CardContent>
@@ -182,8 +191,8 @@ const GameDetail = () => {
 
             {/* 下载链接卡片 */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
                   <Download className="h-5 w-5" />
                   下载地址
                 </CardTitle>
@@ -193,36 +202,36 @@ const GameDetail = () => {
                   game.download_links.map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted"
+                      className="p-4 rounded-lg bg-muted space-y-3"
                     >
-                      <div>
-                        <p className="font-medium">{link.platform_name}</p>
-                        {link.extract_code && (
-                          <p className="text-sm text-muted-foreground">
-                            提取码: {link.extract_code}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {link.extract_code && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => copyExtractCode(link.extract_code!)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        )}
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{link.platform_name}</span>
                         <Button size="sm" asChild>
                           <a
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            下载
+                            <ExternalLink className="h-4 w-4 mr-1.5" />
+                            前往下载
                           </a>
                         </Button>
                       </div>
+                      {link.extract_code && (
+                        <div className="flex items-center justify-between p-2 rounded bg-background">
+                          <span className="text-sm">
+                            提取码: <code className="font-mono font-bold">{link.extract_code}</code>
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyExtractCode(link.extract_code!)}
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            复制
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (
@@ -235,6 +244,8 @@ const GameDetail = () => {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };
