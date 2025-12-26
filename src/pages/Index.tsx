@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import BannerCarousel from "@/components/home/BannerCarousel";
 import FeaturedGames from "@/components/home/FeaturedGames";
 import TagFilter from "@/components/home/TagFilter";
@@ -12,10 +13,10 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header searchValue={search} onSearchChange={setSearch} />
 
-      <main className="container py-8 space-y-8">
+      <main className="container py-8 space-y-8 flex-1">
         {/* 轮播图 */}
         <BannerCarousel />
 
@@ -40,12 +41,7 @@ const Index = () => {
         </section>
       </main>
 
-      {/* 页脚 */}
-      <footer className="border-t bg-muted/50">
-        <div className="container py-6 text-center text-sm text-muted-foreground">
-          <p>© 2024 游戏资源站. 仅供学习交流使用，请支持正版游戏。</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
