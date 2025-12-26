@@ -1,22 +1,24 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/hooks/useGames";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ImageLightbox from "@/components/game/ImageLightbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Download, Copy, Eye, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, Copy, Eye, Calendar, ExternalLink, ZoomIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 
 const GameDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: game, isLoading } = useGame(id || "");
   const { toast } = useToast();
   const [search, setSearch] = useState("");
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Increment view count
   useEffect(() => {
@@ -31,6 +33,27 @@ const GameDetail = () => {
       title: "复制成功",
       description: "提取码已复制到剪贴板",
     });
+  };
+
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const handleNextImage = () => {
+    if (game?.screenshots) {
+      setCurrentImageIndex((prev) =>
+        prev === game.screenshots!.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
+  const handlePreviousImage = () => {
+    if (game?.screenshots) {
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? game.screenshots!.length - 1 : prev - 1
+      );
+    }
   };
 
   if (isLoading) {
@@ -104,20 +127,29 @@ const GameDetail = () => {
             {game.screenshots && game.screenshots.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">游戏截图</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    游戏截图
+                    <span className="text-sm font-normal text-muted-foreground">
+                      (点击放大)
+                    </span>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {game.screenshots.map((screenshot) => (
+                    {game.screenshots.map((screenshot, index) => (
                       <div
                         key={screenshot.id}
-                        className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer hover:ring-2 ring-primary transition-all"
+                        className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group relative hover:ring-2 ring-primary transition-all"
+                        onClick={() => openLightbox(index)}
                       >
                         <img
                           src={screenshot.image_url}
-                          alt="游戏截图"
-                          className="w-full h-full object-cover"
+                          alt={`游戏截图 ${index + 1}`}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <ZoomIn className="h-8 w-8 text-foreground" />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -246,6 +278,18 @@ const GameDetail = () => {
       </main>
 
       <Footer />
+
+      {/* 截图放大预览 */}
+      {game.screenshots && (
+        <ImageLightbox
+          images={game.screenshots}
+          currentIndex={currentImageIndex}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          onNext={handleNextImage}
+          onPrevious={handlePreviousImage}
+        />
+      )}
     </div>
   );
 };
