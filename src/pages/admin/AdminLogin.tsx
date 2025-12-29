@@ -17,7 +17,8 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,15 +26,30 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      await signIn(email, password);
-      toast({
-        title: "登录成功",
-        description: "欢迎回来，管理员",
-      });
+      if (isSignUp) {
+        await signUp(email, password);
+        toast({
+          title: "注册成功",
+          description: "账户已创建，请联系超级管理员授予管理权限",
+        });
+        setIsSignUp(false);
+      } else {
+        await signIn(email, password);
+        toast({
+          title: "登录成功",
+          description: "欢迎回来，管理员",
+        });
+      }
     } catch (error: any) {
+      let message = error.message || "请检查邮箱和密码";
+      if (error.message?.includes("User already registered")) {
+        message = "该邮箱已注册";
+      } else if (error.message?.includes("Invalid login credentials")) {
+        message = "邮箱或密码错误";
+      }
       toast({
-        title: "登录失败",
-        description: error.message || "请检查邮箱和密码",
+        title: isSignUp ? "注册失败" : "登录失败",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -49,7 +65,9 @@ const AdminLogin = () => {
             <Gamepad2 className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl">管理后台</CardTitle>
-          <CardDescription>请输入管理员账号登录</CardDescription>
+          <CardDescription>
+            {isSignUp ? "创建管理员账户" : "请输入管理员账号登录"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,23 +87,33 @@ const AdminLogin = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="请输入密码"
+                placeholder={isSignUp ? "设置密码（至少6位）" : "请输入密码"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  登录中...
+                  {isSignUp ? "注册中..." : "登录中..."}
                 </>
               ) : (
-                "登录"
+                isSignUp ? "注册" : "登录"
               )}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <Button
+              variant="link"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm"
+            >
+              {isSignUp ? "已有账户？返回登录" : "没有账户？注册新账户"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
