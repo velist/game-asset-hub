@@ -29,6 +29,7 @@ const GameForm = ({ game, onSuccess, onCancel }: GameFormProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState<GameFormData>({
     title: game?.title || "",
+    summary: game?.summary || "",
     description: game?.description || "",
     version_info: game?.version_info || "",
     is_featured: game?.is_featured || false,
@@ -160,7 +161,18 @@ const GameForm = ({ game, onSuccess, onCancel }: GameFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">游戏介绍</Label>
+            <Label htmlFor="summary">简短介绍</Label>
+            <Textarea
+              id="summary"
+              value={formData.summary}
+              onChange={(e) => setFormData((prev) => ({ ...prev, summary: e.target.value }))}
+              placeholder="一句话描述游戏亮点（显示在列表）"
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">详细介绍</Label>
             <Textarea
               id="description"
               value={formData.description}

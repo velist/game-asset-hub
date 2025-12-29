@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export interface GameFormData {
   title: string;
+  summary: string;
   description: string;
   version_info: string;
   is_featured: boolean;
@@ -39,6 +40,7 @@ export const useGameMutations = () => {
         .from("games")
         .insert({
           title: data.title,
+          summary: data.summary || null,
           description: data.description || null,
           version_info: data.version_info || null,
           is_featured: data.is_featured,
@@ -102,6 +104,7 @@ export const useGameMutations = () => {
         .from("games")
         .update({
           title: data.title,
+          summary: data.summary || null,
           description: data.description || null,
           version_info: data.version_info || null,
           is_featured: data.is_featured,
