@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ImageLightbox from "@/components/game/ImageLightbox";
+import RelatedGames from "@/components/game/RelatedGames";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,6 +176,11 @@ const GameDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* 相关游戏推荐 */}
+            {game.tags && game.tags.length > 0 && (
+              <RelatedGames currentGameId={game.id} tags={game.tags} />
+            )}
           </div>
 
           {/* 右侧信息栏 */}
