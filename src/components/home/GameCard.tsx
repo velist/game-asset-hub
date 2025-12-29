@@ -29,9 +29,9 @@ const GameCard = ({ game }: GameCardProps) => {
           <h3 className="font-semibold text-lg line-clamp-1 mb-2">
             {game.title}
           </h3>
-          {game.version_info && (
-            <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-              {game.version_info}
+          {game.summary && (
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+              {game.summary}
             </p>
           )}
           <div className="flex flex-wrap gap-1">
