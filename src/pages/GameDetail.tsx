@@ -22,9 +22,12 @@ const GameDetail = () => {
 
   // Increment view count
   useEffect(() => {
-    if (id) {
-      (supabase.rpc as any)("increment_view_count", { game_id: id }).catch(console.error);
-    }
+    const incrementView = async () => {
+      if (id) {
+        await supabase.rpc("increment_view_count", { game_id: id });
+      }
+    };
+    incrementView();
   }, [id]);
 
   const copyExtractCode = (code: string) => {
