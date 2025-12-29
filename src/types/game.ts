@@ -11,6 +11,7 @@ export interface Game {
   cover_url: string | null;
   description: string | null;
   version_info: string | null;
+  summary: string | null;
   is_featured: boolean;
   view_count: number;
   created_at: string;

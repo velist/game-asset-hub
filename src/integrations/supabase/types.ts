@@ -165,6 +165,7 @@ export type Database = {
           description: string | null
           id: string
           is_featured: boolean
+          summary: string | null
           title: string
           updated_at: string
           version_info: string | null
@@ -176,6 +177,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_featured?: boolean
+          summary?: string | null
           title: string
           updated_at?: string
           version_info?: string | null
@@ -187,6 +189,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_featured?: boolean
+          summary?: string | null
           title?: string
           updated_at?: string
           version_info?: string | null
