@@ -17,6 +17,9 @@ const navItems = [
   { to: "/admin/games", icon: Gamepad, label: "游戏管理" },
   { to: "/admin/tags", icon: Tags, label: "标签管理" },
   { to: "/admin/banners", icon: Image, label: "轮播图管理" },
+  { to: "/admin/popups", icon: Image, label: "弹窗管理" },
+  { to: "/admin/widgets", icon: Image, label: "悬浮组件" },
+  { to: "/admin/announcements", icon: Image, label: "公告管理" },
 ];
 
 const AdminSidebar = () => {
