@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Gamepad2 } from "lucide-react";
+import { Search, Gamepad2, Bell } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -32,6 +32,12 @@ const Header = ({ searchValue = "", onSearchChange }: HeaderProps = {}) => {
         <nav className="flex items-center gap-2">
           <Button variant="ghost" asChild>
             <Link to="/">首页</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/announcements" className="flex items-center gap-1">
+              <Bell className="h-4 w-4" />
+              公告
+            </Link>
           </Button>
         </nav>
       </div>
