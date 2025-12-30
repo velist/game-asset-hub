@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
-  searchValue: string;
-  onSearchChange: (value: string) => void;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-const Header = ({ searchValue, onSearchChange }: HeaderProps) => {
+const Header = ({ searchValue = "", onSearchChange }: HeaderProps = {}) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between gap-4">
@@ -23,7 +23,7 @@ const Header = ({ searchValue, onSearchChange }: HeaderProps) => {
             <Input
               placeholder="搜索游戏..."
               value={searchValue}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => onSearchChange?.(e.target.value)}
               className="pl-10"
             />
           </div>

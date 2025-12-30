@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_pinned: boolean
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_pinned?: boolean
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_pinned?: boolean
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           created_at: string
@@ -92,6 +125,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      floating_widgets: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_url: string | null
+          position: string
+          sort_order: number
+          title: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          position: string
+          sort_order?: number
+          title?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          position?: string
+          sort_order?: number
+          title?: string | null
+          type?: string
+        }
+        Relationships: []
       }
       game_screenshots: {
         Row: {
@@ -194,6 +266,48 @@ export type Database = {
           updated_at?: string
           version_info?: string | null
           view_count?: number
+        }
+        Relationships: []
+      }
+      popups: {
+        Row: {
+          content: string | null
+          created_at: string
+          delay_seconds: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_text: string | null
+          link_url: string | null
+          show_once: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          delay_seconds?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_text?: string | null
+          link_url?: string | null
+          show_once?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          delay_seconds?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_text?: string | null
+          link_url?: string | null
+          show_once?: boolean
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
