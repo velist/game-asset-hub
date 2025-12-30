@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Pin, ChevronRight } from "lucide-react";
+import { format } from "date-fns";
 
 const PinnedAnnouncements = () => {
   const { data: announcements, isLoading } = useQuery({
@@ -45,7 +46,7 @@ const PinnedAnnouncements = () => {
           <Link key={announcement.id} to={`/announcement/${announcement.id}`}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardContent className="py-3 px-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <Badge variant="secondary" className="shrink-0">
                     置顶
                   </Badge>
@@ -53,7 +54,12 @@ const PinnedAnnouncements = () => {
                     {announcement.title}
                   </span>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-sm text-muted-foreground">
+                    {format(new Date(announcement.created_at), "MM-dd")}
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
               </CardContent>
             </Card>
           </Link>
