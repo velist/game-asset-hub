@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Prevent browser-extensions overlays from blocking clicks in preview (e.g. immersive translate) */
+#immersive-translate-browser-popup,
+#immersive-translate-popup,
+#immersive-translate-popup-container,
+[id^="immersive-translate"] {
+  pointer-events: none !important;
+}
+
+#immersive-translate-browser-popup,
+#immersive-translate-popup,
+#immersive-translate-popup-container {
+  display: none !important;
+}
+
