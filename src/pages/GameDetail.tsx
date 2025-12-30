@@ -186,7 +186,7 @@ const GameDetail = () => {
           {/* 右侧信息栏 */}
           <div className="space-y-6">
             {/* 游戏信息卡片 */}
-            <Card className="sticky top-24">
+            <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl leading-tight">{game.title}</CardTitle>
               </CardHeader>
