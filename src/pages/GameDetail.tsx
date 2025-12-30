@@ -275,49 +275,49 @@ const GameDetail = () => {
         />
       )}
 
-      {/* 下载二维码弹窗 */}
+      {/* 下载二维码弹窗 - 横版布局 */}
       <Dialog open={downloadModalOpen} onOpenChange={setDownloadModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
               下载地址
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-4">
+          <div className="flex flex-wrap gap-4 py-4">
             {game.download_links?.map((link: DownloadLink) => (
               <div
                 key={link.id}
-                className="flex flex-col items-center p-4 rounded-lg bg-muted space-y-4"
+                className="flex items-center gap-4 p-4 rounded-lg bg-muted"
               >
-                {/* 网盘名称 */}
-                <h3 className="text-lg font-semibold">{link.platform_name}</h3>
-
                 {/* 二维码 */}
-                <div className="bg-white p-3 rounded-lg">
+                <div className="bg-white p-2 rounded-lg shrink-0">
                   <QRCodeSVG
                     value={link.url}
-                    size={180}
+                    size={100}
                     level="M"
                     includeMargin={false}
                   />
                 </div>
 
-                {/* 提取码 */}
-                {link.extract_code && (
-                  <div className="flex items-center gap-2 p-2 px-4 rounded-lg bg-background">
-                    <span className="text-sm">
-                      提取码: <code className="font-mono font-bold text-primary">{link.extract_code}</code>
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyExtractCode(link.extract_code!)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
+                {/* 信息 */}
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-semibold">{link.platform_name}</h3>
+                  {link.extract_code && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">提取码:</span>
+                      <code className="font-mono font-bold text-primary">{link.extract_code}</code>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => copyExtractCode(link.extract_code!)}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -119,10 +119,49 @@ const GameForm = ({ game, onSuccess, onCancel }: GameFormProps) => {
     }));
   };
 
+  // 自动识别网盘名称
+  const detectPlatformName = (url: string): string => {
+    const patterns: { pattern: RegExp; name: string }[] = [
+      { pattern: /pan\.baidu\.com|yun\.baidu\.com/, name: "百度网盘" },
+      { pattern: /www\.123pan\.com|123pan\.com/, name: "123云盘" },
+      { pattern: /pan\.quark\.cn|quark\.cn/, name: "夸克网盘" },
+      { pattern: /www\.aliyundrive\.com|aliyundrive\.com|alipan\.com/, name: "阿里云盘" },
+      { pattern: /cloud\.189\.cn|189\.cn/, name: "天翼云盘" },
+      { pattern: /pan\.xunlei\.com|xunlei\.com/, name: "迅雷云盘" },
+      { pattern: /weiyun\.com/, name: "腾讯微云" },
+      { pattern: /drive\.google\.com/, name: "Google Drive" },
+      { pattern: /mega\.nz|mega\.co\.nz/, name: "MEGA" },
+      { pattern: /mediafire\.com/, name: "MediaFire" },
+      { pattern: /1drv\.ms|onedrive\.live\.com/, name: "OneDrive" },
+      { pattern: /dropbox\.com/, name: "Dropbox" },
+      { pattern: /lanzou[a-z]*\.com/, name: "蓝奏云" },
+      { pattern: /ctfile\.com/, name: "城通网盘" },
+    ];
+    
+    for (const { pattern, name } of patterns) {
+      if (pattern.test(url)) {
+        return name;
+      }
+    }
+    return "";
+  };
+
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
       toast({ title: "请输入游戏名称", variant: "destructive" });
       return;
+    }
+
+    // 验证下载链接必填字段
+    for (const link of formData.download_links) {
+      if (!link.url.trim()) {
+        toast({ title: "请填写下载链接", variant: "destructive" });
+        return;
+      }
+      if (!link.platform_name.trim()) {
+        toast({ title: "请填写网盘名称", variant: "destructive" });
+        return;
+      }
     }
 
     if (game) {
@@ -289,17 +328,25 @@ const GameForm = ({ game, onSuccess, onCancel }: GameFormProps) => {
               <div key={i} className="flex gap-2 items-start p-3 rounded-lg border">
                 <div className="flex-1 space-y-2">
                   <Input
-                    placeholder="网盘名称（如：百度网盘）"
+                    placeholder="下载链接 *"
+                    value={link.url}
+                    onChange={(e) => {
+                      const url = e.target.value;
+                      updateDownloadLink(i, "url", url);
+                      // 自动识别网盘名称
+                      const detectedName = detectPlatformName(url);
+                      if (detectedName && !link.platform_name) {
+                        updateDownloadLink(i, "platform_name", detectedName);
+                      }
+                    }}
+                  />
+                  <Input
+                    placeholder="网盘名称（自动识别）"
                     value={link.platform_name}
                     onChange={(e) => updateDownloadLink(i, "platform_name", e.target.value)}
                   />
                   <Input
-                    placeholder="下载链接"
-                    value={link.url}
-                    onChange={(e) => updateDownloadLink(i, "url", e.target.value)}
-                  />
-                  <Input
-                    placeholder="提取码（可选）"
+                    placeholder="提取码（选填）"
                     value={link.extract_code}
                     onChange={(e) => updateDownloadLink(i, "extract_code", e.target.value)}
                   />
