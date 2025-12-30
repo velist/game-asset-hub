@@ -10,8 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Download, Copy, Eye, Calendar, ExternalLink, ZoomIn } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, Download, Copy, Eye, Calendar, ZoomIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { QRCodeSVG } from "qrcode.react";
+
+interface DownloadLink {
+  id: string;
+  platform_name: string;
+  url: string;
+  extract_code: string | null;
+  sort_order: number;
+}
 
 const GameDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +35,7 @@ const GameDetail = () => {
   const [search, setSearch] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
 
   // Increment view count
   useEffect(() => {
@@ -227,58 +243,17 @@ const GameDetail = () => {
                     <span>{new Date(game.created_at).toLocaleDateString("zh-CN")}</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* 下载链接卡片 */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Download className="h-5 w-5" />
-                  下载地址
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {game.download_links && game.download_links.length > 0 ? (
-                  game.download_links.map((link) => (
-                    <div
-                      key={link.id}
-                      className="p-4 rounded-lg bg-muted space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{link.platform_name}</span>
-                        <Button size="sm" asChild>
-                          <a
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4 mr-1.5" />
-                            前往下载
-                          </a>
-                        </Button>
-                      </div>
-                      {link.extract_code && (
-                        <div className="flex items-center justify-between p-2 rounded bg-background">
-                          <span className="text-sm">
-                            提取码: <code className="font-mono font-bold">{link.extract_code}</code>
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyExtractCode(link.extract_code!)}
-                          >
-                            <Copy className="h-4 w-4 mr-1" />
-                            复制
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-center py-4">
-                    暂无下载链接
-                  </p>
+                {/* 立即下载按钮 */}
+                {game.download_links && game.download_links.length > 0 && (
+                  <Button
+                    className="w-full mt-2"
+                    size="lg"
+                    onClick={() => setDownloadModalOpen(true)}
+                  >
+                    <Download className="mr-2 h-5 w-5" />
+                    立即下载
+                  </Button>
                 )}
               </CardContent>
             </Card>
@@ -299,6 +274,55 @@ const GameDetail = () => {
           onPrevious={handlePreviousImage}
         />
       )}
+
+      {/* 下载二维码弹窗 */}
+      <Dialog open={downloadModalOpen} onOpenChange={setDownloadModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              下载地址
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {game.download_links?.map((link: DownloadLink) => (
+              <div
+                key={link.id}
+                className="flex flex-col items-center p-4 rounded-lg bg-muted space-y-4"
+              >
+                {/* 网盘名称 */}
+                <h3 className="text-lg font-semibold">{link.platform_name}</h3>
+
+                {/* 二维码 */}
+                <div className="bg-white p-3 rounded-lg">
+                  <QRCodeSVG
+                    value={link.url}
+                    size={180}
+                    level="M"
+                    includeMargin={false}
+                  />
+                </div>
+
+                {/* 提取码 */}
+                {link.extract_code && (
+                  <div className="flex items-center gap-2 p-2 px-4 rounded-lg bg-background">
+                    <span className="text-sm">
+                      提取码: <code className="font-mono font-bold text-primary">{link.extract_code}</code>
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyExtractCode(link.extract_code!)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
