@@ -35,35 +35,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
+    let subscription: { unsubscribe: () => void } | null = null;
 
-      if (session?.user) {
-        const adminStatus = await checkAdminRole(session.user.id);
-        setIsAdmin(adminStatus);
-      } else {
+    try {
+      const result = supabase.auth.onAuthStateChange(async (_event, session) => {
+        try {
+          setUser(session?.user ?? null);
+
+          if (session?.user) {
+            const adminStatus = await checkAdminRole(session.user.id);
+            setIsAdmin(adminStatus);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (err) {
+          // In some privacy/incognito contexts, storage access can fail.
+          console.error("Auth state change handler error:", err);
+          setUser(null);
+          setIsAdmin(false);
+        } finally {
+          setIsLoading(false);
+        }
+      });
+
+      subscription = result.data.subscription;
+    } catch (err) {
+      console.error("Auth listener init error:", err);
+      setUser(null);
+      setIsAdmin(false);
+      setIsLoading(false);
+    }
+
+    const initSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data.session;
+
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          const adminStatus = await checkAdminRole(session.user.id);
+          setIsAdmin(adminStatus);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (err) {
+        console.error("Initial session check error:", err);
+        setUser(null);
         setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      setIsLoading(false);
-    });
-
-    // Initial session check
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        const adminStatus = await checkAdminRole(session.user.id);
-        setIsAdmin(adminStatus);
-      }
-
-      setIsLoading(false);
-    });
+    initSession();
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
