@@ -33,9 +33,6 @@ const Header = ({ searchValue = "", onSearchChange }: HeaderProps = {}) => {
           <Button variant="ghost" asChild>
             <Link to="/">首页</Link>
           </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/admin">管理后台</Link>
-          </Button>
         </nav>
       </div>
     </header>
