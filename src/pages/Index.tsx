@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BannerCarousel from "@/components/home/BannerCarousel";
 import FeaturedGames from "@/components/home/FeaturedGames";
+import PinnedAnnouncements from "@/components/home/PinnedAnnouncements";
 import TagFilter from "@/components/home/TagFilter";
 import SortSelect, { type SortOption } from "@/components/home/SortSelect";
 import GameList from "@/components/home/GameList";
@@ -19,6 +20,9 @@ const Index = () => {
       <main className="container py-8 space-y-8 flex-1">
         {/* 轮播图 */}
         <BannerCarousel />
+
+        {/* 置顶公告 */}
+        <PinnedAnnouncements />
 
         {/* 精选推荐 */}
         <FeaturedGames />
